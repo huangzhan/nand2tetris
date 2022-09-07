@@ -9,26 +9,72 @@
  * consists of 32,768 words, each holding a 16-bit binary number.
  */ 
 class Memory {
+    static Array ram;
+    static Array heap;
+    static Array freeList;
 
     /** Initializes the class. */
     function void init() {
+        let ram = 0;
+        let heap = 2048;
+        let freeList = heap;
+        let freeList[0] = 0;
+        let freeList[1] = 14334;
+        return;
     }
 
     /** Returns the RAM value at the given address. */
     function int peek(int address) {
+        return ram[address];
     }
 
     /** Sets the RAM value at the given address to the given value. */
     function void poke(int address, int value) {
+        let ram[address] = value;
+        return;
     }
 
     /** Finds an available RAM block of the given size and returns
      *  a reference to its base address. */
     function int alloc(int size) {
+        var Array chunk, chunk2;
+        var boolean found;
+        var int nsize;
+        let chunk2 = 0;
+        let chunk = freeList;
+        while (true) {
+            if (chunk[1] > (size+1)) {
+                let nsize = chunk[1] - size -2;
+                let chunk2 = chunk + nsize + 2;
+                let chunk[1] = nsize;
+                let chunk2[0] = 0;
+                let chunk2[1] = size;
+                return chunk2 + 2;
+            } else {
+                if (chunk[1] > (size-1)) {
+                    if (chunk2 = 0) {
+                        let freeList = chunk[0];
+                    } else {
+                        let chunk2[0] = chunk[0];
+                    }
+                    let chunk[0] = 0;
+                    return chunk+2;
+                }
+                let chunk2 = chunk;
+                let chunk = chunk[0];
+                if (chunk = 0) {
+                    return 0;
+                }
+            }
+        }
+        return 0;
     }
 
     /** De-allocates the given object (cast as an array) by making
      *  it available for future allocations. */
     function void deAlloc(Array o) {
-    }    
+        let o[0] = freeList;
+        let freeList = o;
+        return;
+    } 
 }

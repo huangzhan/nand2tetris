@@ -8,13 +8,38 @@
  * Note: Jack compilers implement multiplication and division using OS method calls.
  */
 class Math {
+    static Array bitmaps;
 
     /** Initializes the library. */
     function void init() {
+        let bitmaps = Array.new(16);
+        let bitmaps[0] = 1;
+        let bitmaps[1] = 2;
+        let bitmaps[2] = 4;
+        let bitmaps[3] = 8;
+        let bitmaps[4] = 16;
+        let bitmaps[5] = 32;
+        let bitmaps[6] = 64;
+        let bitmaps[7] = 128;
+        let bitmaps[8] = 256;
+        let bitmaps[9] = 512;
+        let bitmaps[10] = 1024;
+        let bitmaps[11] = 2048;
+        let bitmaps[12] = 4096;
+        let bitmaps[13] = 8192;
+        let bitmaps[14] = 16384;
+        let bitmaps[15] = 32767;
+        let bitmaps[15] = ~bitmaps[15];
+        return;
     }
 
     /** Returns the absolute value of x. */
     function int abs(int x) {
+        if (x<0) {
+            return -x;
+        } else {
+            return x;
+        }
     }
 
     /** Returns the product of x and y. 
@@ -23,25 +48,89 @@ class Math {
      *  the Jack expressions x*y and multiply(x,y) return the same value.
      */
     function int multiply(int x, int y) {
+        var int sum, i, tmp;
+        let sum = 0;
+        let i = 0;
+        let tmp = x;
+        
+        while (i<16) {
+            if ((y&bitmaps[i]) = bitmaps[i]) {
+                let sum = sum + tmp;
+            }
+            let tmp = tmp + tmp;
+            let i = i + 1;
+        }
+        return sum;
     }
 
+    function int _divide(int x, int y) {
+        var int q;
+        if (y > x | y < 0) {
+            return 0;
+        }
+        let q = Math._divide(x, y+y);
+        if ((x-(2*q*y)) < y) {
+            return q+q;
+        } else {
+            return q+q+1;
+        }
+    }
     /** Returns the integer part of x/y.
      *  When a Jack compiler detects the multiplication operator '/' in the 
      *  program's code, it handles it by invoking this method. In other words,
      *  the Jack expressions x/y and divide(x,y) return the same value.
      */
     function int divide(int x, int y) {
+        var int ax, ay, aq;
+        let ax = Math.abs(x);
+        let ay = Math.abs(y);
+        let aq = Math._divide(ax, ay);
+        if (x = ax) {
+            if (y = ay) {
+                return aq;
+            } else {
+                return -aq;
+            }
+        } else {
+            if (y = ay) {
+                return -aq;
+            } else {
+                return aq;
+            }
+        }
     }
 
     /** Returns the integer part of the square root of x. */
     function int sqrt(int x) {
+        var int y, j, ny, tmp;
+        let y = 0;
+        let j = 7;
+        while (j + 1 > 0) {
+            let ny = y + bitmaps[j];
+            let tmp = ny * ny;
+            if ((tmp -1 < x) & (tmp > 0)) {
+                let y = ny;
+            }
+            let j = j - 1;
+        }
+        return y;
     }
 
     /** Returns the greater number. */
     function int max(int a, int b) {
+        if (a > b) {
+            return a;
+        } else {
+            return b;
+        }
     }
 
     /** Returns the smaller number. */
     function int min(int a, int b) {
+        if (a < b) {
+            return a;
+        } else {
+            return b;
+        }
     }
 }
